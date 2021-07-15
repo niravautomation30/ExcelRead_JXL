@@ -1,0 +1,220 @@
+add below dependency in pom.xml file 
+
+ <!-- https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl -->
+        <dependency>
+            <groupId>net.sourceforge.jexcelapi</groupId>
+            <artifactId>jxl</artifactId>
+            <version>2.6.12</version>
+        </dependency>
+        
+        
+        
+ /*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+import java.awt.AWTException;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+/**
+ *
+ * @author niravkumar2
+ */
+public class CorporateRegistration {
+
+    private WebDriver driver;
+    private String baseUrl;
+    private Workbook wb;
+    private Sheet sh;
+    int numrow = 0;
+    int numcol = 0;
+
+    public CorporateRegistration() {
+    }
+
+    @DataProvider(name = "TestDataCorporateRegistration")
+    public Object[][] dataSet() throws IOException, BiffException {
+
+        wb = Workbook.getWorkbook(new File("/home/niravkumar2/Desktop/Refresh_Registration.xls"));
+        sh = wb.getSheet(0);
+        numrow = sh.getRows();
+        numcol = sh.getColumns();
+
+        Object[][] data = new Object[numrow - 1][numcol];
+        for (int i = 1; i < numrow; i++) {
+            for (int j = 0; j < numcol; j++) {
+                data[i - 1][j] = sh.getCell(j, i).getContents();
+                System.out.println("getContents=" + sh.getCell(j, i).getContents());
+            }
+        }
+        return data;
+    }
+
+    @Test(dataProvider = "TestDataCorporateRegistration")
+    public void testCorporateRegistration(String Company, String SubCompany, String Employee, String GSTNO, String typeCompany, String NaturBusiness,
+            String panno, String panFile, String Address, String Country, String State, String City, String pin, String adminPname, String adminPmobile,
+            String adminPemail, String contactPname, String contactPmobile, String contactPemail, String BankName, String BankAcc, String BankIFSC,
+            String fileCancelCheck, String alert1
+    ) throws InterruptedException, AWTException {
+
+        try {
+            driver.get(baseUrl);
+            driver.findElement(By.id("userName")).sendKeys("jasvendar");
+            driver.findElement(By.id("passWord")).sendKeys("Njindia1");
+            /*
+             // using enter key press
+             Robot rt = new Robot();
+             rt.keyPress(KeyEvent.VK_ENTER);
+             rt.keyRelease(KeyEvent.VK_ENTER);
+             */
+            // by cssSelector
+            driver.findElement(By.cssSelector("input.log-btn")).click();
+            // by xpath
+            //driver.findElement(By.xpath("//input[@value='Login']")).click();
+            Thread.sleep(3000);
+
+            driver.findElement(By.linkText("Refresh")).click();
+            Thread.sleep(3000);
+
+            Actions action = new Actions(driver);
+            action.moveToElement(driver.findElement(By.xpath("//a[contains(text(),'MASTER')]"))).build().perform();
+            driver.findElement(By.xpath("//a[contains(text(),'Corporate Registration')]")).click();
+            Thread.sleep(3000);
+
+            //  Corporate Registration 
+            if (!Company.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtCompanyName")).sendKeys(Company);
+            }
+            if (!SubCompany.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtSubCompanyName")).sendKeys(SubCompany);
+            }
+            if (!Employee.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtEmployeeName")).sendKeys(Employee);
+            }
+            if (!GSTNO.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtGstNoVal")).sendKeys(GSTNO);
+            }
+
+            new Select(driver.findElement(By.id("cmbTypeOfCompany"))).selectByVisibleText(typeCompany);
+
+            if (!NaturBusiness.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtNAtureOfbusiness")).sendKeys(NaturBusiness);
+            }
+            if (!panno.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtpanno")).sendKeys(panno);
+            }
+            if (!panFile.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("panFile")).sendKeys(panFile);
+            }
+
+            //  Contact Details
+            if (!Address.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtregisteredaddress")).sendKeys(Address);
+            }
+            if (!Country.trim().equalsIgnoreCase("")) {
+                new Select(driver.findElement(By.id("cmbCountry"))).selectByVisibleText(Country);
+            }
+            if (!State.trim().equalsIgnoreCase("")) {
+                new Select(driver.findElement(By.id("cmbState"))).selectByVisibleText(State);
+            }
+            if (!City.trim().equalsIgnoreCase("")) {
+                new Select(driver.findElement(By.id("cmbCity"))).selectByVisibleText(City);
+            }
+            if (!pin.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtPincode")).sendKeys(pin);
+            }
+            if (!adminPname.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtAdminPersonName")).sendKeys(adminPname);
+            }
+            if (!adminPmobile.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtAdminMobileNumber")).sendKeys(adminPmobile);
+            }
+            if (!adminPemail.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtAdminEmailId")).sendKeys(adminPemail);
+            }
+
+            // Additional Contact Details 
+            if (!contactPname.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtContactPerson")).sendKeys(contactPname);
+            }
+            if (!contactPmobile.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtcontactMobile")).sendKeys(contactPmobile);
+            }
+            if (!contactPemail.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtContactEmaiilID")).sendKeys(contactPemail);
+            }
+
+            // Banking Details        
+            if (!BankName.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtBankName1")).sendKeys(BankName);
+            }
+            if (!BankAcc.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtBankAccno1")).sendKeys(BankAcc);
+            }
+            if (!BankIFSC.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("txtIsfcCode1")).sendKeys(BankIFSC);
+            }
+            if (!fileCancelCheck.trim().equalsIgnoreCase("")) {
+                driver.findElement(By.id("fileCancelCheque1")).sendKeys(fileCancelCheck);
+            }
+
+            // Apply
+            driver.findElement(By.xpath(".//*[@id='hide_menumain1']/div[4]/div/a[1]/strong")).click();
+
+            // Alert Message
+            if (!alert1.trim().equalsIgnoreCase("")) {
+                driver.switchTo().alert();
+                Assert.assertEquals(alert1, driver.switchTo().alert().getText());
+                driver.switchTo().alert().accept();
+            }
+        } catch (Exception e) {
+            System.out.println("MSG=========================" + e.getMessage());
+        } finally {
+        }
+    }
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+    @BeforeMethod   
+    public void setUpMethod() throws Exception {
+                
+        driver = new FirefoxDriver();
+        baseUrl = "http://dev.njtechdesk.com/acl/index.fin";
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(3000, TimeUnit.SECONDS);
+    }
+
+    @AfterMethod
+    public void tearDownMethod(ITestResult result) throws Exception {
+        if (ITestResult.FAILURE == result.getStatus()) {
+            System.out.println("======================in fail test =============");
+        }
+        driver.quit();
+    }
+}
